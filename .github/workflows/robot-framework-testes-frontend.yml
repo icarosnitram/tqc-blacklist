@@ -4,7 +4,7 @@ on:
   pull_request:
     branches:
       - main
-
+      
 jobs:
   robot-framework-testes-frontend:
     runs-on: ubuntu-latest
@@ -23,6 +23,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install robotframework
           pip install robotframework-seleniumlibrary
+          pip install robotframework-requests  # Adicionado
+          pip install robotframework-faker     # Adicionado
 
       - name: Install Chrome and ChromeDriver
         uses: browser-actions/setup-chrome@v1
