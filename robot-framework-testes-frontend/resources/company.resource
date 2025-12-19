@@ -128,42 +128,33 @@ Preencher Complemento
     Input Text    id:complement    ${complement}
 
 Editar Primeira Empresa
-    [Documentation]    Edita a primeira empresa e garante o salvamento.
+    [Documentation]
     
-    # 1. Abre a edição
     Wait Until Element Is Visible    xpath:(//button[text()='Editar'])[1]    timeout=10s
     Click Button    xpath:(//button[text()='Editar'])[1]
 
-    # 2. Aguarda o modal
     Wait Until Element Is Visible    xpath://*[text()='Editar Cadastro']    timeout=10s
     
     Sleep    2s
 
-    # 3. Gera e preenche os dados
     ${nova_empresa}=    Gerar Empresa
     Preencher Razao Social    ${nova_empresa['razao_social']}
     Preencher Nome Fantasia   ${nova_empresa['nome_fantasia']}
 
-    # 4. TENTATIVA DE SALVAR MAIS ROBUSTA
-    # Verifica se o botão Salvar está visível e HABILITADO antes de clicar
     Wait Until Element Is Visible    xpath://button[text()='Salvar']    timeout=10s
     Wait Until Element Is Enabled    xpath://button[text()='Salvar']    timeout=10s
     
-    # Clica no elemento (as vezes 'Click Button' falha em modais, 'Click Element' é mais direto)
     Click Element    xpath://button[text()='Salvar']
     
-    # 5. Verifica se a janela fechou. Se não fechar, tira um print para vermos o erro.
     ${status_modal}=    Run Keyword And Return Status    Wait Until Element Is Not Visible    xpath://*[text()='Editar Cadastro']    timeout=5s
     
     Run Keyword If    '${status_modal}' == 'False'    Capture Page Screenshot    filename=erro_modal_nao_fechou.png
     Run Keyword If    '${status_modal}' == 'False'    Fail    O modal nao fechou. Verifique se ha campos invalidos (ver print erro_modal_nao_fechou.png).
 
-    # 6. Validação final na lista (Usando a busca para garantir)
     Validar Edicao Na Lista    ${nova_empresa['razao_social']}
 
 Validar Edicao Na Lista
     [Arguments]    ${nome_esperado}
-    # Filtra pelo nome para evitar problemas de paginação
     Wait Until Element Is Visible    xpath://input[@placeholder='Buscar por nome, CNPJ ou razão social...']    timeout=10s
     Input Text    xpath://input[@placeholder='Buscar por nome, CNPJ ou razão social...']    ${nome_esperado}
     Wait Until Page Contains    ${nome_esperado}    timeout=10s
