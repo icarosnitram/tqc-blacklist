@@ -126,3 +126,37 @@ Preencher Complemento
     [Arguments]    ${complement}
     Wait Until Element Is Visible    id:complement    timeout=10s
     Input Text    id:complement    ${complement}
+
+Editar Primeira Empresa
+    [Documentation]
+    
+    Wait Until Element Is Visible    xpath:(//button[text()='Editar'])[1]    timeout=10s
+    Click Button    xpath:(//button[text()='Editar'])[1]
+
+    Wait Until Element Is Visible    xpath://*[text()='Editar Cadastro']    timeout=10s
+    
+    Sleep    2s
+
+    ${nova_empresa}=    Gerar Empresa
+    Preencher Razao Social    ${nova_empresa['razao_social']}
+    Preencher Nome Fantasia   ${nova_empresa['nome_fantasia']}
+
+    Wait Until Element Is Visible    xpath://button[text()='Salvar']    timeout=10s
+    Wait Until Element Is Enabled    xpath://button[text()='Salvar']    timeout=10s
+    
+    Click Element    xpath://button[text()='Salvar']
+    
+    ${status_modal}=    Run Keyword And Return Status    Wait Until Element Is Not Visible    xpath://*[text()='Editar Cadastro']    timeout=5s
+    
+    Run Keyword If    '${status_modal}' == 'False'    Capture Page Screenshot    filename=erro_modal_nao_fechou.png
+    Run Keyword If    '${status_modal}' == 'False'    Fail    O modal nao fechou. Verifique se ha campos invalidos (ver print erro_modal_nao_fechou.png).
+
+    Validar Edicao Na Lista    ${nova_empresa['razao_social']}
+
+Validar Edicao Na Lista
+    [Arguments]    ${nome_esperado}
+    Wait Until Element Is Visible    xpath://input[@placeholder='Buscar por nome, CNPJ ou razão social...']    timeout=10s
+    Input Text    xpath://input[@placeholder='Buscar por nome, CNPJ ou razão social...']    ${nome_esperado}
+    Wait Until Page Contains    ${nome_esperado}    timeout=10s
+    
+
