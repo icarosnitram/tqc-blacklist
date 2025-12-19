@@ -14,3 +14,5 @@ Abrir Navegador
 
 Fechar Navegador
     Close Browser
+
+    # ajuste headless
