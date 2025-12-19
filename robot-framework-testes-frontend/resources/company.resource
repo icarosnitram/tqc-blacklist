@@ -1,0 +1,171 @@
+*** Settings ***
+Library    SeleniumLibrary
+Resource    ../config/dev.robot
+Resource    login.resource
+Resource    generate_random_data.resource
+
+
+*** Keywords ***
+Acessar Pagina Empresas
+    Click Element    id:Cadastros
+
+    Wait Until Element Is Visible    id:Empresas    timeout=10s
+    Click Element    id:Empresas
+
+    Wait Until Location Is    ${BASE_URL_UI}/company    timeout=10s
+    Location Should Be    ${BASE_URL_UI}/company
+
+    Wait Until Element Is Visible    xpath://h1[text()='Empresas']    timeout=10s
+    Element Text Should Be    xpath://h1[text()='Empresas']    Empresas
+
+Cadastrar Nova Empresa  
+    Wait Until Element Is Visible    xpath://button[text()='Nova Empresa']    timeout=10s
+    Click Button    xpath://button[text()='Nova Empresa']
+
+    Wait Until Element Is Visible    xpath://h5[text()='Novo Cadastro']    timeout=10s
+    Element Should Be Visible    xpath://h5[text()='Novo Cadastro']
+
+    Preencher Formulario Empresa
+    
+    Wait Until Element Is Visible    xpath://button[text()='Salvar']    timeout=10s
+    Click Button    xpath://button[text()='Salvar']
+
+    Sleep    10s
+
+
+Preencher Formulario Empresa
+    ${dados_empresa}=    Gerar Empresa
+    
+    Preencher Razao Social   ${dados_empresa['razao_social']}
+    Preencher Nome Fantasia   ${dados_empresa['nome_fantasia']}
+    Preencher Email da Empresa    ${dados_empresa['email']}
+    Preencher CNPJ   ${dados_empresa['cnpj']}
+    Preencher Telefone   ${dados_empresa['telefone']}
+    Preencher Nome do Responsavel    ${dados_empresa['nome_responsavel']}
+    Preencher Descricao do Servico    ${dados_empresa['descricao']}
+    Preencher CEP    ${dados_empresa['cep']}
+    Preencher Pais    ${dados_empresa['pais']}
+    Preencher Cidade    ${dados_empresa['cidade']}
+    Preencher Estado   ${dados_empresa['estado']}
+    Preencher Bairro    ${dados_empresa['bairro']}
+    Preencher Rua    ${dados_empresa['rua']}
+    Preencher Numero do imovel    ${dados_empresa['numero_imovel']}
+    Preencher Complemento    ${dados_empresa['complemento']}
+
+Preencher Razao Social
+    [Arguments]    ${companyName}
+    Wait Until Element Is Visible    id:companyName    timeout=10s
+    Input Text    id:companyName    ${companyName}
+
+Preencher Nome Fantasia
+    [Arguments]    ${fantasyName}
+    Wait Until Element Is Visible    id:fantasyName    timeout=10s
+    Input Text    id:fantasyName    ${fantasyName}
+
+Preencher Email da Empresa
+    [Arguments]    ${companyMail}
+    Wait Until Element Is Visible    id:companyMail    timeout=10s
+    Input Text    id:companyMail    ${companyMail}
+
+Preencher CNPJ
+    [Arguments]    ${matriz}
+    Wait Until Element Is Visible    id:matriz    timeout=10s
+    Input Text    id:matriz    ${matriz}
+
+Preencher Telefone
+    [Arguments]    ${telephone}
+    Wait Until Element Is Visible    id:telephone    timeout=10s
+    Input Text    id:telephone    ${telephone}
+
+Preencher Nome do Responsavel
+    [Arguments]    ${fullName}
+    Wait Until Element Is Visible    id:fullName    timeout=10s
+    Input Text    id:fullName    ${fullName}
+
+Preencher Descricao do Servico
+    [Arguments]    ${serviceDescription}
+    Wait Until Element Is Visible    id:serviceDescription    timeout=10s
+    Input Text    id:serviceDescription    ${serviceDescription}
+
+Preencher CEP
+    [Arguments]    ${zipCode}
+    Wait Until Element Is Visible    id:zipCode    timeout=10s
+    Input Text    id:zipCode    ${zipCode}
+
+Preencher Pais
+    [Arguments]    ${country}
+    Wait Until Element Is Visible    id:country    timeout=10s
+    Input Text    id:country    ${country}
+
+Preencher Cidade
+    [Arguments]    ${city}
+    Wait Until Element Is Visible    id:city    timeout=10s
+    Input Text    id:city    ${city}
+
+Preencher Estado
+    [Arguments]    ${state}
+    Wait Until Element Is Visible    id:state    timeout=10s
+    Input Text    id:state    ${state}
+
+Preencher Bairro
+    [Arguments]    ${district}
+    Wait Until Element Is Visible    id:district    timeout=10s
+    Input Text    id:district    ${district}
+
+Preencher Rua
+    [Arguments]    ${street}
+    Wait Until Element Is Visible    id:street    timeout=10s
+    Input Text    id:street    ${street}
+
+Preencher Numero do Imovel
+    [Arguments]    ${number}
+    Wait Until Element Is Visible    id:number    timeout=10s
+    Input Text    id:number    ${number}
+
+Preencher Complemento
+    [Arguments]    ${complement}
+    Wait Until Element Is Visible    id:complement    timeout=10s
+    Input Text    id:complement    ${complement}
+
+Editar Primeira Empresa
+    [Documentation]    Edita a primeira empresa e garante o salvamento.
+    
+    # 1. Abre a edição
+    Wait Until Element Is Visible    xpath:(//button[text()='Editar'])[1]    timeout=10s
+    Click Button    xpath:(//button[text()='Editar'])[1]
+
+    # 2. Aguarda o modal
+    Wait Until Element Is Visible    xpath://*[text()='Editar Cadastro']    timeout=10s
+    
+    Sleep    2s
+
+    # 3. Gera e preenche os dados
+    ${nova_empresa}=    Gerar Empresa
+    Preencher Razao Social    ${nova_empresa['razao_social']}
+    Preencher Nome Fantasia   ${nova_empresa['nome_fantasia']}
+
+    # 4. TENTATIVA DE SALVAR MAIS ROBUSTA
+    # Verifica se o botão Salvar está visível e HABILITADO antes de clicar
+    Wait Until Element Is Visible    xpath://button[text()='Salvar']    timeout=10s
+    Wait Until Element Is Enabled    xpath://button[text()='Salvar']    timeout=10s
+    
+    # Clica no elemento (as vezes 'Click Button' falha em modais, 'Click Element' é mais direto)
+    Click Element    xpath://button[text()='Salvar']
+    
+    # 5. Verifica se a janela fechou. Se não fechar, tira um print para vermos o erro.
+    ${status_modal}=    Run Keyword And Return Status    Wait Until Element Is Not Visible    xpath://*[text()='Editar Cadastro']    timeout=5s
+    
+    Run Keyword If    '${status_modal}' == 'False'    Capture Page Screenshot    filename=erro_modal_nao_fechou.png
+    Run Keyword If    '${status_modal}' == 'False'    Fail    O modal nao fechou. Verifique se ha campos invalidos (ver print erro_modal_nao_fechou.png).
+
+    # 6. Validação final na lista (Usando a busca para garantir)
+    Validar Edicao Na Lista    ${nova_empresa['razao_social']}
+
+Validar Edicao Na Lista
+    [Arguments]    ${nome_esperado}
+    # Filtra pelo nome para evitar problemas de paginação
+    Wait Until Element Is Visible    xpath://input[@placeholder='Buscar por nome, CNPJ ou razão social...']    timeout=10s
+    Input Text    xpath://input[@placeholder='Buscar por nome, CNPJ ou razão social...']    ${nome_esperado}
+    Wait Until Page Contains    ${nome_esperado}    timeout=10s
+    
+
